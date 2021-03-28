@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSocket</title>
+</head>
+
+<body>
+  <div class="websocket">
+    <div class="receive">
+      <p>服务端返回的消息</p>
+      <div id="receive-box"></div>
+    </div>
+    <div class="send">
+      <textarea type="text" id="msg-need-send"></textarea>
+      <p>
+        <button id="send-btn">点击发消息给服务端</button>
+      </p>
+    </div>
+    <button id="exit">关闭连接</button>
+  </div>
+  <script>
+    const msgBox = document.getElementById("msg-need-send")
+    const sendBtn = document.getElementById("send-btn")
+    const exit = document.getElementById("exit")
+    const receiveBox = document.getElementById("receive-box")
+
+    // 创建一个webSocket对象
+    const ws = new WebSocket("ws://127.0.0.1:3000/websocket/test")
+    ws.onopen = e => {
+      // 连接后监听
+      console.log(`WebSocket 连接状态： ${ws.readyState}`)
+    }
+
+    ws.onmessage = data => {
+      // 当服务端返回数据的时候，放到页面里
+      receiveBox.innerHTML += `<p>${data.data}</p>`
+      receiveBox.scrollTo({
+        top: receiveBox.scrollHeight,
+        behavior: "smooth"
+      })
+    }
+
+    ws.onclose = data => {
+      // 监听连接关闭
+      console.log("WebSocket连接已关闭")
+      console.log(data);
+    }
+
+    sendBtn.onclick = () => {
+      // 点击发送按钮。将数据发送给服务端
+      ws.send(msgBox.value)
+    }
+    exit.onclick = () => {
+      // 客户端主动关闭连接
+      ws.close()
+    }
+  </script>
+</body>
+
+</html>
